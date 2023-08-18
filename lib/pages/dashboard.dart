@@ -49,14 +49,14 @@ class _DashboardState extends State<Dashboard> {
                     await FirebaseAuth.instance.signOut();
                     Navigator.of(context).pushReplacementNamed('/login');
                   },
-                  child: Text('Log Out'),
+                  child: const Text('Log Out'),
                 ),
               ],
             ),
             floatingActionButton: FloatingActionButton(onPressed: () {}),
             drawer: customDrawer(context, profileImageUrl,
                 userData), // Pass context and profileImageUrl
-            body: const Text(
+            body:  Text(
                 'List of task for work or list of livraison') // Replace this with your actual body content
             );
       },
