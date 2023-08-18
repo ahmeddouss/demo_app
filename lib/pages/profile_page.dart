@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:demo_app/pages/edit_page.dart ';
+import 'package:demo_app/pages/edit_page.dart';
 
 class ProfilePage extends StatefulWidget {
   ProfilePage();
