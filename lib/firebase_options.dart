@@ -17,24 +17,15 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for android - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return android;
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -52,7 +43,38 @@ class DefaultFirebaseOptions {
     }
   }
 
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyCBq8EC-M7u7JpAyeZDidx18YaYU-93ayM',
+    appId: '1:18177252443:web:bcdca400f9438d1c33f37e',
+    messagingSenderId: '18177252443',
+    projectId: 'fir-flutter-d45f6',
+    authDomain: 'fir-flutter-d45f6.firebaseapp.com',
+    databaseURL: 'https://fir-flutter-d45f6-default-rtdb.firebaseio.com',
+    storageBucket: 'fir-flutter-d45f6.appspot.com',
+    measurementId: 'G-7ZBVC2248G',
+  );
+
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyDZWRMD88U1An4eGbxKQ3gAV0lc4fy6hsI',
+    appId: '1:18177252443:android:e295018828500fe833f37e',
+    messagingSenderId: '18177252443',
+    projectId: 'fir-flutter-d45f6',
+    databaseURL: 'https://fir-flutter-d45f6-default-rtdb.firebaseio.com',
+    storageBucket: 'fir-flutter-d45f6.appspot.com',
+  );
+
   static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyB81urMOGXYtuCTbsLwUE-v11jfsV151iM',
+    appId: '1:18177252443:ios:a861f4ab7c6c7afd33f37e',
+    messagingSenderId: '18177252443',
+    projectId: 'fir-flutter-d45f6',
+    databaseURL: 'https://fir-flutter-d45f6-default-rtdb.firebaseio.com',
+    storageBucket: 'fir-flutter-d45f6.appspot.com',
+    iosClientId: '18177252443-6hr2mq5gqgdtnuii16b66ka5vf8i7tsc.apps.googleusercontent.com',
+    iosBundleId: 'com.example.demoApp.RunnerTests',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyB81urMOGXYtuCTbsLwUE-v11jfsV151iM',
     appId: '1:18177252443:ios:a861f4ab7c6c7afd33f37e',
     messagingSenderId: '18177252443',
