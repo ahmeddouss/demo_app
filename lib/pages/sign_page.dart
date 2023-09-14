@@ -1,10 +1,10 @@
-import 'dart:io';
+// ignore_for_file: prefer_final_fields, library_private_types_in_public_api, prefer_const_constructors, use_key_in_widget_constructors, use_build_context_synchronously
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:io';
+import 'package:demo_app/services/chat/auth_service.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+
+import '../services/chat/image_service.dart';
 
 class RegistrationPage extends StatefulWidget {
   @override
@@ -12,28 +12,14 @@ class RegistrationPage extends StatefulWidget {
 }
 
 class _RegistrationPageState extends State<RegistrationPage> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  //final ImagePicker _imagePicker = ImagePicker();
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseStorage _storage = FirebaseStorage.instance;
-
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _firstNameController = TextEditingController();
   TextEditingController _lastNameController = TextEditingController();
   TextEditingController _phoneNumberController = TextEditingController();
   TextEditingController _jobController = TextEditingController();
-  final ImagePicker _picker = ImagePicker();
 
   File? selectedImage;
-  getImage(ImageSource source) async {
-    final XFile? image = await _picker.pickImage(source: source);
-    if (image != null) {
-      selectedImage = File(image.path);
-      setState(() {});
-    }
-  }
 
   @override
   void dispose() {
@@ -44,50 +30,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
     _phoneNumberController.dispose();
     _jobController.dispose();
     super.dispose();
-  }
-
-  Future<void> _registerUser() async {
-    try {
-      final email = _emailController.text;
-      final password = _passwordController.text;
-      final authResult = await _auth.createUserWithEmailAndPassword(
-          email: email, password: password);
-
-      final user = authResult.user;
-      if (user != null) {
-        if (selectedImage != null) {
-          final Reference storageRef =
-              _storage.ref().child('profile_images/$email');
-
-          // Upload the image to Firebase Storage
-          final UploadTask uploadTask = storageRef.putFile(selectedImage!);
-
-          // Monitor the upload process
-          await uploadTask.whenComplete(() async {
-            final url = await storageRef.getDownloadURL();
-
-            // Store additional user information in Firestore or Realtime Database
-            final userDocument = _firestore.collection('users').doc(user.uid);
-            await userDocument.set({
-              'first_name': _firstNameController.text,
-              'last_name': _lastNameController.text,
-              'email': email,
-              'phone_number': _phoneNumberController.text,
-              'job': _jobController.text,
-              'profile_image_url': url, // Store the download URL of the image
-            });
-
-            // Navigate to another page or display a success message
-          });
-        } else {
-          // No profile image provided
-          print('No profile image selected.');
-        }
-      }
-    } catch (e) {
-      // Handle registration errors, show a message, etc.
-      print('Registration error: $e');
-    }
   }
 
   @override
@@ -101,8 +43,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             InkWell(
-                onTap: () {
-                  getImage(ImageSource.camera);
+                onTap: () async {
+                  selectedImage = await StorageMethods().pickImage();
+                  setState(() {});
                 },
                 child: selectedImage == null
                     ? Container(
@@ -158,8 +101,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
             ),
             SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () {
-                _registerUser();
+              onPressed: () async {
+                await AuthMethods().registerUser(
+                    email: _emailController.text,
+                    password: _passwordController.text,
+                    firstName: _firstNameController.text,
+                    lastName: _lastNameController.text,
+                    phoneNumber: _phoneNumberController.text,
+                    job: _jobController.text,
+                    selectedImage: selectedImage);
                 Navigator.of(context).pushReplacementNamed('/home');
               },
               child: Text('Register'),

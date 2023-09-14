@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:demo_app/pages/post_page.dart';
 import 'package:demo_app/pages/profile_page.dart';
+import 'package:demo_app/pages/test.dart';
 import 'package:demo_app/pages/users_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -40,25 +41,38 @@ class _DashboardState extends State<Dashboard> {
         final userData = snapshot.data!.data() as Map<String, dynamic>;
         final profileImageUrl = userData['profile_image_url'];
         return Scaffold(
-            appBar: AppBar(
-              title: Text('Dashboard'),
-              actions: <Widget>[
-                ElevatedButton(
-                  onPressed: () async {
-                    await _updateOnlineStatus(uid, false, users);
-                    await FirebaseAuth.instance.signOut();
-                    Navigator.of(context).pushReplacementNamed('/login');
+          appBar: AppBar(
+            title: Text('Dashboard'),
+            actions: <Widget>[
+              ElevatedButton(
+                onPressed: () async {
+                  await _updateOnlineStatus(uid, false, users);
+                  await FirebaseAuth.instance.signOut();
+                  Navigator.of(context).pushReplacementNamed('/login');
+                },
+                child: const Text('Log Out'),
+              ),
+            ],
+          ),
+          floatingActionButton: FloatingActionButton(onPressed: () {}),
+          drawer: customDrawer(context, profileImageUrl,
+              userData), // Pass context and profileImageUrl
+          body: Column(
+            children: [
+              Text('List of task for work or list of livraison'),
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Test(),
+                      ),
+                    );
                   },
-                  child: const Text('Log Out'),
-                ),
-              ],
-            ),
-            floatingActionButton: FloatingActionButton(onPressed: () {}),
-            drawer: customDrawer(context, profileImageUrl,
-                userData), // Pass context and profileImageUrl
-            body:  Text(
-                'List of task for work or list of livraison') // Replace this with your actual body content
-            );
+                  child: Text('test'))
+            ],
+          ), // Replace this with your actual body content
+        );
       },
     );
   }
@@ -174,4 +188,10 @@ Widget customDrawer(BuildContext context, profileImageUrl, userData) {
       ],
     ),
   );
+}
+
+void main() {
+  runApp(MaterialApp(
+    home: Dashboard(),
+  ));
 }

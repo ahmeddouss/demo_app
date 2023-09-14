@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:demo_app/pages/sign_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+
+import 'package:demo_app/user_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -18,10 +21,8 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _errorMessage; // Add a variable to store the error message
 
   final _formkey = GlobalKey<FormState>();
-
-  TextEditingController _emailcontroller = TextEditingController();
-
-  TextEditingController _passwordcontroller = TextEditingController();
+  final TextEditingController _emailcontroller = TextEditingController();
+  final TextEditingController _passwordcontroller = TextEditingController();
 
   @override
   void dispose() {
@@ -63,27 +64,36 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(
                 height: 25,
               ),
-              ElevatedButton(
-                child: Text('Login'),
-                onPressed: () async {
-                  try {
-                    final UserCredential userCredential =
-                        await FirebaseAuth.instance.signInWithEmailAndPassword(
-                            email: _emailcontroller.text,
-                            password: _passwordcontroller.text);
+              Consumer<UserProvider>(
+                builder: (context, userProvider, child) {
+                  return ElevatedButton(
+                    child: Text('Login'),
+                    onPressed: () async {
+                      try {
+                        final UserCredential userCredential = await FirebaseAuth
+                            .instance
+                            .signInWithEmailAndPassword(
+                          email: _emailcontroller.text,
+                          password: _passwordcontroller.text,
+                        );
 
-                    await _updateOnlineStatus(userCredential.user!.uid, true);
-                    Navigator.of(context).pushReplacementNamed('/home');
-                  } on FirebaseAuthException catch (e) {
-                    print('Failed with error code: ${e.code}');
-                    print(e.message);
-                    setState(() {
-                      _errorMessage = e.message ??
-                          "An error occurred"; // Assign a default value if e.message is null
-                    });
-                  }
+                        await _updateOnlineStatus(
+                            userCredential.user!.uid, true);
+                        userProvider.fetchUserData();
+                        Navigator.of(context).pushReplacementNamed('/home');
+                      } on FirebaseAuthException catch (e) {
+                        print('Failed with error code: ${e.code}');
+                        print(e.message);
+                        setState(() {
+                          _errorMessage = e.message ??
+                              "An error occurred"; // Assign a default value if e.message is null
+                        });
+                      }
+                    },
+                  );
                 },
               ),
+
               SizedBox(
                 height: 15,
               ),
