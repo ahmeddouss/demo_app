@@ -123,6 +123,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+//test
   Future<void> _updateOnlineStatus(String uid, bool isOnline) async {
     try {
       await users.doc(uid).update({
