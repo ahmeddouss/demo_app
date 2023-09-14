@@ -70,7 +70,20 @@ class DefaultFirebaseOptions {
     projectId: 'fir-flutter-d45f6',
     databaseURL: 'https://fir-flutter-d45f6-default-rtdb.firebaseio.com',
     storageBucket: 'fir-flutter-d45f6.appspot.com',
-    iosClientId: '18177252443-6hr2mq5gqgdtnuii16b66ka5vf8i7tsc.apps.googleusercontent.com',
+    iosClientId:
+        '18177252443-6hr2mq5gqgdtnuii16b66ka5vf8i7tsc.apps.googleusercontent.com',
+    iosBundleId: 'com.example.demoApp.RunnerTests',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyB81urMOGXYtuCTbsLwUE-v11jfsV151iM',
+    appId: '1:18177252443:ios:a861f4ab7c6c7afd33f37e',
+    messagingSenderId: '18177252443',
+    projectId: 'fir-flutter-d45f6',
+    databaseURL: 'https://fir-flutter-d45f6-default-rtdb.firebaseio.com',
+    storageBucket: 'fir-flutter-d45f6.appspot.com',
+    iosClientId:
+        '18177252443-6hr2mq5gqgdtnuii16b66ka5vf8i7tsc.apps.googleusercontent.com',
     iosBundleId: 'com.example.demoApp.RunnerTests',
   );
 

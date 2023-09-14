@@ -1,12 +1,29 @@
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:io';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 
-class PostService extends ChangeNotifier {
-  Future<File?> _pickImage() async {
+class StorageMethods {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
+
+  // adding image to firebase storage
+  Future<String> uploadImageToStorage(String childName, File? imageFile) async {
+    // creating location to our firebase storage
+
+    Reference ref =
+        _storage.ref().child(childName).child(_auth.currentUser!.uid);
+
+    // putting in uint8list format -> Upload task like a future but not future
+    final UploadTask uploadTask = ref.putFile(imageFile!);
+
+    // Monitor the upload process
+    TaskSnapshot snapshot = await uploadTask;
+    String downloadUrl = await snapshot.ref.getDownloadURL();
+    return downloadUrl;
+  }
+
+  Future<File?> pickImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
@@ -15,22 +32,5 @@ class PostService extends ChangeNotifier {
     }
 
     return null;
-  }
-
-  Future<void> _addPost(String content, String userId) async {
-    final postReference =
-        await FirebaseFirestore.instance.collection('posts').add({
-      'user_id': userId,
-      'content': content,
-    });
-
-    if (_selectedImage != null) {
-      final storageReference = FirebaseStorage.instance
-          .ref()
-          .child('post_images/${postReference.id}');
-      await storageReference.putFile(_selectedImage!);
-      final downloadUrl = await storageReference.getDownloadURL();
-      await postReference.update({'image_url': downloadUrl});
-    }
   }
 }

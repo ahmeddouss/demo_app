@@ -58,7 +58,7 @@ class _ChatPageState extends State<ChatPage> {
                   var onlineText = isOnline ? 'Online' : 'Offline';
                   return Text(
                     onlineText,
-                    style: TextStyle(fontSize: 10, color: Colors.white),
+                    style: const TextStyle(fontSize: 10, color: Colors.white),
                   );
                 },
               ),
@@ -127,14 +127,14 @@ class _ChatPageState extends State<ChatPage> {
         Expanded(
           child: TextFormField(
             controller: _messageController,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               hintText: 'enter message',
             ),
           ),
         ),
         IconButton(
           onPressed: sendMessage,
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_upward,
             size: 40,
           ),

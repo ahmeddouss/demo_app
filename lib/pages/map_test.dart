@@ -7,7 +7,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:georouter/georouter.dart';
 import 'package:demo_app/georoutes_provider.dart';
 import 'package:provider/provider.dart';
-import 'dart:async';
 
 class MapsPage extends StatefulWidget {
   const MapsPage({Key? key}) : super(key: key);
@@ -23,7 +22,7 @@ void main() {
         ChangeNotifierProvider(create: (context) => GeoRoutesProvider()),
         StreamProvider<Position?>(
             create: (context) => StreamLocationProvider().positionStream,
-            initialData: const Position(
+            initialData: Position(
               latitude: 36.805483,
               longitude: 10.239920,
               timestamp: null,
@@ -48,9 +47,6 @@ class _MapsPageState extends State<MapsPage> {
   List<LatLng> polylineCoordinates = [];
   double distance = 0;
   double speedMps = 0.0;
-  Stopwatch? stopwatch;
-
-  Timer? timer; // Declare a Timer
   Future<void> getLocation() async {
     Position locationService = await LocationService().getCurrentLocations();
     location = LatLng(locationService.latitude, locationService.longitude);
@@ -86,26 +82,17 @@ class _MapsPageState extends State<MapsPage> {
     super.initState();
     // Initialize the geolocator and start listening to the position stream
     getLocation();
-    stopwatch = Stopwatch()..start(); // Initialize and start the stopwatch
-
-    // Create a Timer to update the UI every second
-    timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
-      if (liveMode) {
-        setState(() {}); // Update the UI
-      }
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    String formattedTime = _formatTime(stopwatch!.elapsed);
     return Scaffold(
         appBar: AppBar(title: const Text('Nearby')),
-        body: liveMode ? liveMaps(formattedTime) : mapsFix(formattedTime),
+        body: liveMode ? liveMaps() : mapsFix(),
         floatingActionButton: !liveMode
             ? FloatingActionButton(
-                onPressed: () {
-                  getLocation();
+                onPressed: () async {
+                  await getLocation();
                   if (polylineCoordinates.isNotEmpty) {
                     getDirectionDistance(location, target);
                   }
@@ -115,13 +102,7 @@ class _MapsPageState extends State<MapsPage> {
             : null);
   }
 
-  String _formatTime(Duration duration) {
-    final minutes = duration.inMinutes;
-    final seconds = duration.inSeconds % 60;
-    return '$minutes:${seconds.toString().padLeft(2, '0')}';
-  }
-
-  Widget mapsFix(formattedTime) {
+  Widget mapsFix() {
     return Stack(
       children: [
         FlutterMap(
@@ -135,16 +116,11 @@ class _MapsPageState extends State<MapsPage> {
               subdomains: ['a', 'b', 'c'],
             ),
             MarkerLayerOptions(markers: [
-              if (location != null)
-                Marker(
-                    point: location!,
-                    builder: (context) {
-                      return const Icon(
-                        Icons.circle,
-                        color: Colors.blue,
-                        size: 30.0,
-                      );
-                    })
+              Marker(
+                  point: location!,
+                  builder: (context) {
+                    return Container(color: Colors.red);
+                  })
             ]),
             PolylineLayerOptions(polylines: [
               if (polylineCoordinates.isNotEmpty)
@@ -175,7 +151,6 @@ class _MapsPageState extends State<MapsPage> {
                         onPressed: () {
                           setState(() {
                             liveMode = true;
-                            stopwatch!.start();
                           });
                         },
                         child: Text("start")),
@@ -192,7 +167,7 @@ class _MapsPageState extends State<MapsPage> {
     );
   }
 
-  Widget liveMaps(formattedTime) {
+  Widget liveMaps() {
     return Stack(children: [
       Consumer2<GeoRoutesProvider, Position?>(
           builder: (context, directions, positionStream, child) {
@@ -216,11 +191,7 @@ class _MapsPageState extends State<MapsPage> {
               Marker(
                 point: livePosition,
                 builder: (context) {
-                  return const Icon(
-                    Icons.location_on,
-                    color: Colors.red,
-                    size: 40.0,
-                  );
+                  return Container(color: Colors.red);
                 },
               ),
             ]),
@@ -257,17 +228,10 @@ class _MapsPageState extends State<MapsPage> {
                       'Speed :${speedMps.toStringAsFixed(2)} m/s',
                       style: TextStyle(fontSize: 16.0),
                     ),
-                    Text(
-                      'Time: $formattedTime', // Use formattedTime here
-                      style: TextStyle(fontSize: 40.0),
-                    ),
                     ElevatedButton(
                         onPressed: () {
                           setState(() {
                             liveMode = false;
-
-                            stopwatch!.reset();
-                            //stopwatch!.stop();
                           });
                         },
                         child: const Icon(Icons.stop))
